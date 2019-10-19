@@ -14,24 +14,24 @@ Functionality-
 Functions:
 */
 public class sequenceGenerator{
-	// Input params
-	int seqLen; //
-	int numSeq;
-	double frac_a;
-	double frac_c;
-	double frac_g;
-	double frac_t;
-	double mutationProbability;
-	String outfile;
-	// Other params
-	double fracSum;
-	String firstSeq;
-	String separator="----------------------------------------------------------------------";
-	char[] firstSeqChar;
-	ArrayList<String> kSeqs;
+	// Parameters input from user
+	int seqLen; // Length of first sequence
+	int numSeq; // Number of total sequences including first
+	double frac_a; // Fraction of nucleotide 'A' in the sequence
+	double frac_c; // Fraction of nucleotide 'C' in the sequence
+	double frac_g; // Fraction of nucleotide 'G' in the sequence
+	double frac_t; // Fraction of nucleotide 'T' in the sequence
+	double mutationProbability; // Mutation probability of a any nucleotide. Range:[0-1]
+	String outfile; // Filename to write output 
+	// Other paramaters required during the run of the program
+	double fracSum; // sum of all fractions. Doesn't have to be 1.
+	String firstSeq; // String to store the first sequence
+	ArrayList<String> kSeqs; // ArrayList to store all k sequences
+	char[] firstSeqChar; // First sequence as a character array for ease of processing
+	String separator="----------------------------------------------------------------------"; // Just a separator
 	//Constructors
 	public void sequenceGenerator(){}
-	
+	// Validation of arguments 
 	public static void main(String args[]) throws IOException{
 		int numArgs = args.length;
 		if(numArgs!=8) {
@@ -66,8 +66,7 @@ public class sequenceGenerator{
 			//showError("output filename",3);
 			return;
 		} 
-		// make sure n, a, c, g, t k are integers and not zero
-		// p must be double
+		// initialize temp variables
 		int n=Integer.parseInt(args[0]);
 		int a=Integer.parseInt(args[1]);
 		int c=Integer.parseInt(args[2]);
@@ -75,7 +74,7 @@ public class sequenceGenerator{
 		int t=Integer.parseInt(args[4]);
 		int k=Integer.parseInt(args[5]);
 		double p=Double.parseDouble(args[6]);
-		
+		// More processing for output filename
 		String ofile=args[7].trim();
 		String[] toks = ofile.split("\\.");
 		if(toks.length==1 || (toks.length>1 && !toks[toks.length-1].equals("txt"))){
@@ -89,14 +88,17 @@ public class sequenceGenerator{
 		sequenceGenerator sg = new sequenceGenerator();
 		sg.init(n, a, c, g, t, k, p, ofile);
 	}
+	// checks if input is a integer and >0
 	public static boolean isNumber(String s){
 		if(s.matches("\\d+") && Integer.parseInt(s)!=0) return true;
 		else return false;
 	}
+	// checks if input is a double and >0.0 and <1.0
 	public static boolean isDouble(String s) {
 		return (s.matches("\\d+(\\.\\d+)?") && Double.parseDouble(s)>0.0 && Double.parseDouble(s)<1.0);  //match a number with decimal.
 		//return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
 	}
+	// Validates filename
 	public static boolean validateFile(String s){
 		String[] toks = s.trim().split("\\.");
 		if(toks.length>1 && !toks[toks.length-1].equals("txt")){
@@ -146,6 +148,7 @@ public class sequenceGenerator{
 		}
 		return filenames;
 	}
+	// Display error
 	public static void showError(String input,int etype){
 		String formatError="Format: java hw1-1 <sequence_length> <fraction_for_a> " +
 						"<fraction_for_c> <fraction_for_g> <fraction_for_t> " +
@@ -157,7 +160,9 @@ public class sequenceGenerator{
 		//else System.out.println("The "+input+" has to be a valid filename");
 		System.out.println(formatError);
 	}
+	// *****************
 	// TASKS STARTS HERE
+	// *****************
 	public void init(int n, int a, int c, int g, int t, int k, double p, String ofile){
 		seqLen=n;
 		fracSum=a+c+g+t;
@@ -204,7 +209,7 @@ public class sequenceGenerator{
 			return "A";
 		}
 	}
-	// Generate k-1 mutated sequence
+	// Generate k-1 mutated sequences
 	public void createKminus1(){
 		kSeqs=new ArrayList<>();
 		kSeqs.add(firstSeq);
@@ -217,6 +222,7 @@ public class sequenceGenerator{
 			//System.out.println(curSeq);
 		}
 	}
+	// Decide if mutation required for a letter and process accordingly
 	public String generateMutatedLetter(char c){
 		String s=Character.toString(c);
 		double num=0.0;
@@ -239,7 +245,7 @@ public class sequenceGenerator{
 		}
 		return s;
 	}
-	// write to file
+	// write sequences to file
 	public void writeToOutfile(){
 		try{
 			/*
