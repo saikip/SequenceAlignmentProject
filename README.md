@@ -19,7 +19,7 @@ Project implements:
 6. SPoutputfileX - X stands for a number. Output file from Sequence Partitioner. To be used as input file for Sequence Assembler.
 7. SAoutputfileX - X stands for a number. Output file from Sequence Assembler. Final output file with a single sequence.
 
-// TO DO
+# TO DO
 0. Complete basic functions.
 1. Create makefile
 2. Create executable for final submission as hw1-1, hw1-2, hw1-3 
