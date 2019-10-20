@@ -14,6 +14,9 @@ Functionality-
 Functions:
 */
 public class sequenceGenerator{
+	// **********************************
+	// VARIABLES
+	// **********************************
 	// Parameters input from user
 	int seqLen; // Length of first sequence
 	int numSeq; // Number of total sequences including first
@@ -23,14 +26,16 @@ public class sequenceGenerator{
 	double frac_t; // Fraction of nucleotide 'T' in the sequence
 	double mutationProbability; // Mutation probability of a any nucleotide. Range:[0-1]
 	String outfile; // Filename to write output 
+	
 	// Other paramaters required during the run of the program
 	double fracSum; // sum of all fractions. Doesn't have to be 1.
 	String firstSeq; // String to store the first sequence
 	ArrayList<String> kSeqs; // ArrayList to store all k sequences
 	char[] firstSeqChar; // First sequence as a character array for ease of processing
 	String separator="----------------------------------------------------------------------"; // Just a separator
-	//Constructors
-	public void sequenceGenerator(){}
+	
+	//Constructor
+	public sequenceGenerator(){}
 	// Validation of arguments 
 	public static void main(String args[]) throws IOException{
 		int numArgs = args.length;
@@ -39,7 +44,7 @@ public class sequenceGenerator{
 			showError("",0);
 			return;
 		}
-		// also check number and srtring
+		// also check number and string
 		if(!isNumber(args[0])){
 			showError("sequence length",1);
 			return;
@@ -88,81 +93,12 @@ public class sequenceGenerator{
 		sequenceGenerator sg = new sequenceGenerator();
 		sg.init(n, a, c, g, t, k, p, ofile);
 	}
-	// checks if input is a integer and >0
-	public static boolean isNumber(String s){
-		if(s.matches("\\d+") && Integer.parseInt(s)!=0) return true;
-		else return false;
-	}
-	// checks if input is a double and >0.0 and <1.0
-	public static boolean isDouble(String s) {
-		return (s.matches("\\d+(\\.\\d+)?") && Double.parseDouble(s)>0.0 && Double.parseDouble(s)<1.0);  //match a number with decimal.
-		//return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
-	}
-	// Validates filename
-	public static boolean validateFile(String s){
-		String[] toks = s.trim().split("\\.");
-		if(toks.length>1 && !toks[toks.length-1].equals("txt")){
-			System.out.println("ERROR: Output file cannot be a "+toks[toks.length-1]+" file. Try again.");
-			return false;
-		}
-		ArrayList<String> filenames = loadFilenames();
-		if(filenames.size()>0) {
-			if(filenames.contains(s) || filenames.contains(s+".txt")){
-				try{
-					System.out.println("Output file already exists. Do you want to replace it? Y for yes; N for no");
-					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-					String response;
-					while(true){
-						response = bufferedReader.readLine();
-						if(response.trim().toUpperCase().equals("Y")){
-							return true;
-						} else if(response.trim().toUpperCase().equals("N")){
-							System.out.println("Exiting... Try again.");
-							return false;
-						}
-						System.out.println("Invalid input! Try again.");
-					}
-				}
-				catch(IOException e){
-					e.printStackTrace();
-					System.out.println("IO exception in filename. Try again.");
-					return false;
-				}
-			}
-		} else if(!s.matches("^\\d*[a-zA-Z][a-zA-Z\\d]*$")){
-			System.out.println("Output file must contain only letters and numbers. Please try again!");
-			return false;
-		} 
-		return true;
-	}	
-	// Read all filenames in folder
-	public static ArrayList<String> loadFilenames(){
-		File folder = new File(System.getProperty("user.dir"));
-		File[] listOfFiles = folder.listFiles();
-		ArrayList<String> filenames = new ArrayList<>();
-
-		for (int i = 0; i < listOfFiles.length; i++) {
-		  if (listOfFiles[i].isFile()) {
-			filenames.add(listOfFiles[i].getName());
-		  }
-		}
-		return filenames;
-	}
-	// Display error
-	public static void showError(String input,int etype){
-		String formatError="Format: java hw1-1 <sequence_length> <fraction_for_a> " +
-						"<fraction_for_c> <fraction_for_g> <fraction_for_t> " +
-						"<number_of_sequences> <mutation_probability(real_number)> <output_file_name>";
-		System.out.print("ERROR:");		
-		if(etype==0) System.out.println("Invalid number of arguments! Try Again.");
-		else if(etype==1) System.out.println("The "+input+" has to be an integer number>0");
-		else if(etype==2) System.out.println("The "+input+" has to be a real number>0.0 AND <1.0");
-		//else System.out.println("The "+input+" has to be a valid filename");
-		System.out.println(formatError);
-	}
-	// *****************
-	// TASKS STARTS HERE
-	// *****************
+	
+	// **********************************
+	// ACTUAL PROCESSING GOES HERE
+	// **********************************
+	
+	// Initialize variables and manage process flow
 	public void init(int n, int a, int c, int g, int t, int k, double p, String ofile){
 		seqLen=n;
 		fracSum=a+c+g+t;
@@ -173,9 +109,11 @@ public class sequenceGenerator{
 		numSeq=k;
 		mutationProbability=p;
 		outfile=ofile;
-		// Tasks
+		// Task 1: Create first sequence of length n
 		getFirstSequence();
+		// Task 2: Create k-1 mutated sequences
 		createKminus1();
+		// Task 3: Write output to file
 		writeToOutfile();
 		System.out.println(separator);
 		System.out.println("Output written to file: " + outfile);
@@ -264,5 +202,81 @@ public class sequenceGenerator{
 			e.printStackTrace();
 			System.out.println("IO Exception! Error writing output to file!");
 		}
+	}
+	
+	// **********************************
+	// PRE-PROCESSING GOES HERE
+	// **********************************
+	// checks if input is a integer and >0
+	public static boolean isNumber(String s){
+		if(s.matches("\\d+") && Integer.parseInt(s)!=0) return true;
+		else return false;
+	}
+	// checks if input is a double and >0.0 and <1.0
+	public static boolean isDouble(String s) {
+		return (s.matches("\\d+(\\.\\d+)?") && Double.parseDouble(s)>0.0 && Double.parseDouble(s)<1.0);  //match a number with decimal.
+		//return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+	}
+	// Validates filename
+	public static boolean validateFile(String s){
+		String[] toks = s.trim().split("\\.");
+		if(toks.length>1 && !toks[toks.length-1].equals("txt")){
+			System.out.println("ERROR: Output file cannot be a "+toks[toks.length-1]+" file. Try again.");
+			return false;
+		}
+		ArrayList<String> filenames = loadFilenames();
+		if(filenames.size()>0) {
+			if(filenames.contains(s) || filenames.contains(s+".txt")){
+				try{
+					System.out.println("Output file already exists. Do you want to replace it? Y for yes; N for no");
+					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+					String response;
+					while(true){
+						response = bufferedReader.readLine();
+						if(response.trim().toUpperCase().equals("Y")){
+							return true;
+						} else if(response.trim().toUpperCase().equals("N")){
+							System.out.println("Exiting... Try again.");
+							return false;
+						}
+						System.out.println("Invalid input! Try again.");
+					}
+				}
+				catch(IOException e){
+					e.printStackTrace();
+					System.out.println("IO exception in filename. Try again.");
+					return false;
+				}
+			}
+		} else if(!s.matches("^\\d*[a-zA-Z][a-zA-Z\\d]*$")){
+			System.out.println("Output file must contain only letters and numbers. Please try again!");
+			return false;
+		} 
+		return true;
+	}	
+	// Read all filenames in folder
+	public static ArrayList<String> loadFilenames(){
+		File folder = new File(System.getProperty("user.dir"));
+		File[] listOfFiles = folder.listFiles();
+		ArrayList<String> filenames = new ArrayList<>();
+
+		for (int i = 0; i < listOfFiles.length; i++) {
+		  if (listOfFiles[i].isFile()) {
+			filenames.add(listOfFiles[i].getName());
+		  }
+		}
+		return filenames;
+	}
+	// Display error
+	public static void showError(String input,int etype){
+		String formatError="Format: java hw1-1 <sequence_length> <fraction_for_a> " +
+						"<fraction_for_c> <fraction_for_g> <fraction_for_t> " +
+						"<number_of_sequences> <mutation_probability(real_number)> <output_file_name>";
+		System.out.print("ERROR:");		
+		if(etype==0) System.out.println("Invalid number of arguments! Try Again.");
+		else if(etype==1) System.out.println("The "+input+" has to be an integer number>0");
+		else if(etype==2) System.out.println("The "+input+" has to be a real number>0.0 AND <1.0");
+		//else System.out.println("The "+input+" has to be a valid filename");
+		System.out.println(formatError);
 	}
 }
