@@ -273,10 +273,12 @@ public class sequenceGenerator{
 						"<fraction_for_c> <fraction_for_g> <fraction_for_t> " +
 						"<number_of_sequences> <mutation_probability(real_number)> <output_file_name>";
 		System.out.print("ERROR:");		
-		if(etype==0) System.out.println("Invalid number of arguments! Try Again.");
+		if(etype==0) {
+			System.out.println("Invalid number of arguments! Try Again.");
+			System.out.println(formatError);
+		}
 		else if(etype==1) System.out.println("The "+input+" has to be an integer number>0");
 		else if(etype==2) System.out.println("The "+input+" has to be a real number>0.0 AND <1.0");
 		//else System.out.println("The "+input+" has to be a valid filename");
-		System.out.println(formatError);
 	}
 }
