@@ -11,16 +11,16 @@ Project implements:
 4. Type 'java <java filename>' without quotes along with reuired commandline arguments for corresponding java class and hit enter.
   
 # Files
-1. sequenceGenerator.java - Simulator for sequence generator [All set? Discuss.]
-2. sequencePartitioner.java (temporary name) - Simulator for sequence partitioning [Ask NEHA for updates]
-3. sequenceAssembler.java - Sequence assembler [complete dp function for getDovetailScore() function]
+1. sequenceGenerator.java - Simulator for sequence generator **[All set? Discuss.]
+2. sequencePartitioner.java (temporary name) - Simulator for sequence partitioning **[Ask NEHA for updates]
+3. sequenceAssembler.java - Sequence assembler **[complete dp function for getDovetailScore() function]
 4. makefile
 5. SGoutputfileX - X stands for a number. Output file from Seqeunce Generator. To be used as input file for Sequence Partitioner.
 6. SPoutputfileX - X stands for a number. Output file from Sequence Partitioner. To be used as input file for Sequence Assembler.
 7. SAoutputfileX - X stands for a number. Output file from Sequence Assembler. Final output file with a single sequence.
 
 # TO DO
-0. Complete basic functions.
+0. Complete basic functions.**Files 1, 2, 3
 1. Create makefile
 2. Create executable for final submission as hw1-1, hw1-2, hw1-3 
 3. Test
