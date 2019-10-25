@@ -66,8 +66,8 @@ public class sequencePartition
 		String seq=inputSequences.get(l);
 	    //int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
 	    int seqLen=seq.length();
-	    //System.out.println(seq.length());
-		System.out.println(randomNum + "is random number");
+	  
+		//System.out.println(randomNum + "is random number");
 		String subSeq="";
 		for(int i=0;i<seqLen;i++)
 		{
