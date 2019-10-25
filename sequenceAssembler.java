@@ -218,13 +218,14 @@ public class sequenceAssembler{
 	public int getDovetailScore(String s1,String s2){
 		int l1=s1.length();
 		int l2=s2.length();
-		int[][] dp=new int[l1+1][l2+1];
 		int maxscore =0;
-		// base cases
-		for(int i=0;i<Math.max(l1,l2);i++) {
-			if(i<l1) dp[i][0]=0;
-			if(i<l2) dp[0][i]=0;
-		}
+		
+		int[][] dp=new int[l1+1][l2+1];
+		// base cases - in java already 0
+		//for(int i=0;i<Math.max(l1,l2);i++) {
+		//	if(i<l1) dp[i][0]=0;
+		//	if(i<l2) dp[0][i]=0;
+		//}
 		// Main
 		for(int i=1;i<=l1;i++){
 			for(int j=1;j<=l2;j++){
@@ -240,6 +241,7 @@ public class sequenceAssembler{
 				if(j==l2) maxscore=Math.max(maxscore,dp[i][j]);
 			}
 		}
+		
 		return maxscore;
 	}
 	// returns aligned sequence - Run backtrack just once after best 2 sequences have been found.
@@ -249,11 +251,12 @@ public class sequenceAssembler{
 		int l2=s2.length();
 		int[][] dp=new int[l1+1][l2+1];
 		int maxscore =0;
-		// base cases
-		for(int i=0;i<Math.max(l1,l2);i++) {
-			if(i<l1) dp[i][0]=0;
-			if(i<l2) dp[0][i]=0;
-		}
+		// base cases - in java already 0
+		//for(int i=0;i<Math.max(l1,l2);i++) {
+		//	if(i<l1) dp[i][0]=0;
+		//	if(i<l2) dp[0][i]=0;
+		//}
+		
 		// Main
 		// One of this would be last row or column
 		int c=0; // column with max score
