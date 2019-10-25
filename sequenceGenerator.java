@@ -36,7 +36,7 @@ public class sequenceGenerator{
 	
 	//Constructor
 	public sequenceGenerator(){}
-	// Validation of arguments 
+	// Main function - Validation of arguments and init
 	public static void main(String args[]) throws IOException{
 		int numArgs = args.length;
 		if(numArgs!=8) {

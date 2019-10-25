@@ -25,12 +25,16 @@ public class sequenceAssembler{
 	int delinVal; // penalty for delete/insert (<0)
 	
 	// Other parameters required during the run of the program
-	String finalSequence;
-	ArrayList<String> allSequences;
+	String finalSequence; //longest sequence at the end of rounds
+	int currMaxScore; //maxscore at the end of each round
+	int[][] scoreMatrix; //matrix to store maxscore among sequences
+	ArrayList<String> allSequences; //stores all sequences; gets updates with new aligned sequences
+	HashSet<Integer> removeSet=new HashSet<>(); //to store indexes of outdated/aligned sequences
 	String separator="----------------------------------------------------------------------"; // Just a separator
 	
 	//Constructor
 	public sequenceAssembler(){}
+	//Main function - Validation of arguments and init
 	public static void main(String args[]) throws IOException{
 		int numArgs = args.length;
 		if(numArgs!=5) {
@@ -77,6 +81,11 @@ public class sequenceAssembler{
 		sequenceAssembler sa = new sequenceAssembler();
 		sa.init(ifile, s,r,d, ofile);
 	}
+	// **********************************
+	// ACTUAL PROCESSING GOES HERE
+	// **********************************
+	
+	// Initialize variables and manage process flow
 	public void init(String ifile, int s, int r, int d, String ofile){
 		infilename=ifile;
 		outfilename=ofile;
@@ -96,54 +105,207 @@ public class sequenceAssembler{
 			return;
 		}
 		// Task 2: Perform dovetail alignment;
+		// Load score matrix to keep scores so as to not re-calculate
+		scoreMatrix=new int[allSequences.size()][allSequences.size()];
+		// Complete process
 		processAllSequences();
 		// Task 3: Write output to file
 		writeToOutfile();
 		System.out.println(separator);
 		System.out.println("Output written to file: " + outfilename);
 	}
-	// Process all sequences until only one sequence is left
+	// Process all sequences until only one sequence is left 
+	// or largest alignment score is negative
 	public void processAllSequences(){
-		while(allSequences.size()>1){
-			alignBestSequencePair();
+		int trueSize=allSequences.size();//actual # of all sequences
+		int currSize=trueSize; //store # sequences for current round
+		int newSeqId=0; // id of newly created aligned sequence
+		currMaxScore=0; // current maxscore to make sure it's not negative
+		
+		// Perform rounds
+		while(currSize>1 && currMaxScore>=0){
+			//System.out.println("# sequences:" + currSize);
+			System.out.println("# of sequences reduced to:" + currSize);
+			if(currSize==trueSize) newSeqId=alignBestSequencePair(true,0);
+			else newSeqId=alignBestSequencePair(false,newSeqId);
+			// Reduce # sequences for next round by 1
+			// Two sequences aligned, 
+			// the result replaced one's index, other one put in outdated matrix
+			currSize--;
+			//System.out.println("overall maxscore: " + currMaxScore);
 		}
-		finalSequence=allSequences.get(0);
+		// Get longest among the non-outdated sequences
+		finalSequence=getLongestSequence();
 	}
-	// Pairwise align all sequences and replace the 
-	// 2 sequences of best score with aligned sequence
-	public void alignBestSequencePair(){
-		int maxScore=0;
-		String seq1=allSequences.get(0);
-		String seq2=allSequences.get(1);
-		String maxSeq="just testing";
-		// align all sequences with each other and keep track of maxScore
+	// Write the longest fragment you assembled into output in Fasta format.
+	public String getLongestSequence(){
+		String longestSeq="";
+		int maxLen=0;
 		for(int i=0;i<allSequences.size();i++){
-			for(int j=i+1;j<allSequences.size();j++){
-				ArrayList<String> info= getDovetailScore(allSequences.get(i),allSequences.get(j));
-				int currScore = Integer.parseInt(info.get(0)); // gets score
-				if(currScore>maxScore){
-					maxScore = currScore;
-					seq1=allSequences.get(i);;
-					seq2=allSequences.get(j);;
-					maxSeq=info.get(1);
+			// only consider non-outdated sequences
+			if(!removeSet.contains(i)){
+				String s=allSequences.get(i);
+				if(s.length()>maxLen) {
+					maxLen=s.length();
+					longestSeq=s;
 				}
 			}
 		}
-		// Remove best 2 seq and replace with aligned sequence
-		allSequences.remove(seq1);
-		allSequences.remove(seq2);
-		allSequences.add(maxSeq);
+		return longestSeq;
 	}
-	// returns score and aligned sequence
-	public ArrayList<String> getDovetailScore(String s1,String s2){
-		// TO DO!!!
-		String currScore = Integer.toString(1);
-		String resultSeq = s1;
+	// Pairwise align all sequences, select 2 sequences with best scores
+	// replace one of the old sequences' index with aligned sequence
+	// Put other old sequences' index in removeSet
+	// return new sequence Index
+	public int alignBestSequencePair(boolean firstTime, int newSeqId){
+		currMaxScore=0;//max score for each round
+		String seq1=allSequences.get(0);
+		String seq2=allSequences.get(1);
+		int id1=0; //index of s1
+		int id2=0; //index of s2
+			
+		String maxSeq="just testing";
+		if(firstTime){
+			// process all sequences
+			// align all sequences with each other and keep track of maxScore
+			for(int i=0;i<allSequences.size();i++){
+				for(int j=i+1;j<allSequences.size();j++){
+					int currScore= getDovetailScore(allSequences.get(i),allSequences.get(j));
+					scoreMatrix[i][j]=currScore;
+					if(currScore>currMaxScore){
+						currMaxScore = currScore;
+						seq1=allSequences.get(i);
+						seq2=allSequences.get(j);
+						id1=i;
+						id2=j;
+					}
+				}
+			}
+		} else {
+			// process only new sequence alignment score with others
+			for(int i=0;i<allSequences.size();i++){
+				for(int j=i+1;j<allSequences.size();j++){
+					int currScore=0;
+					// do only if both sequences are still in consideration and not outdated
+					if(!removeSet.contains(i)&&!removeSet.contains(j)){
+						if(newSeqId==i || newSeqId==j) {
+							//one of these are newly aligned sequence, calculate new scores
+							currScore= getDovetailScore(allSequences.get(i),allSequences.get(j));
+							scoreMatrix[i][j]=currScore; // update score matrix
+						} else {
+							// both old matrices, we already have scores
+							currScore=scoreMatrix[i][j];
+						}
+						if(currScore>currMaxScore){
+							currMaxScore = currScore;
+							seq1=allSequences.get(i);
+							seq2=allSequences.get(j);
+							id1=i;
+							id2=j;
+						}
+					}
+				}
+			}
+		}
+		// Get the aligned sequence for the best score
+		maxSeq=getAlignedSequence(seq1,seq2);
+		//removeSet.add(id1);
+		removeSet.add(id2); //do not consider this sequence anymore
+		allSequences.set(id1,maxSeq); // replace first sequence with new aligned sequence
+		return id1;
+	}
+	// Perform dovetail alignment between 2 sequences and return score
+	public int getDovetailScore(String s1,String s2){
+		int l1=s1.length();
+		int l2=s2.length();
+		int[][] dp=new int[l1+1][l2+1];
+		int maxscore =0;
+		// base cases
+		for(int i=0;i<Math.max(l1,l2);i++) {
+			if(i<l1) dp[i][0]=0;
+			if(i<l2) dp[0][i]=0;
+		}
+		// Main
+		for(int i=1;i<=l1;i++){
+			for(int j=1;j<=l2;j++){
+				if(s1.charAt(i-1)==s2.charAt(j-1)) {
+					dp[i][j]=dp[i-1][j-1]+matchVal;
+				} else {
+					dp[i][j]=Math.max(dp[i-1][j-1]+replaceVal,
+							Math.max(dp[i-1][j] + delinVal,
+									 dp[i][j-1]+delinVal));
+				}
+				// keep track of max number in last column or last row
+				if(i==l1) maxscore=Math.max(maxscore,dp[i][j]);
+				if(j==l2) maxscore=Math.max(maxscore,dp[i][j]);
+			}
+		}
+		return maxscore;
+	}
+	// returns aligned sequence - Run backtrack just once after best 2 sequences have been found.
+	public String getAlignedSequence(String s1,String s2){
+		String resultSeq="";
+		int l1=s1.length();
+		int l2=s2.length();
+		int[][] dp=new int[l1+1][l2+1];
+		int maxscore =0;
+		// base cases
+		for(int i=0;i<Math.max(l1,l2);i++) {
+			if(i<l1) dp[i][0]=0;
+			if(i<l2) dp[0][i]=0;
+		}
+		// Main
+		// One of this would be last row or column
+		int c=0; // column with max score
+		int r=0; // row with max score
+		for(int i=1;i<=l1;i++){
+			for(int j=1;j<=l2;j++){
+				if(s1.charAt(i-1)==s2.charAt(j-1)) {
+					dp[i][j]=dp[i-1][j-1]+matchVal;
+				} else {
+					dp[i][j]=Math.max(dp[i-1][j-1]+replaceVal,
+							Math.max(dp[i-1][j] + delinVal,
+									 dp[i][j-1]+delinVal));
+				}
+				// keep track of max number in last column or last row
+				if(i==l1) {
+					maxscore=Math.max(maxscore,dp[i][j]);
+					r=i;
+					c=l2;
+				}
+				if(j==l2) {
+					maxscore=Math.max(maxscore,dp[i][j]);
+					r=l1;
+					c=j;
+				}
+			}
+		}
+		// Back track
+		int i=r,j=c;
+	    while(i!=0 && j!=0){
+			if(s1.charAt(i-1)==s2.charAt(j-1)){
+				// Match
+				resultSeq=s1.charAt(i-1)+resultSeq;
+				i--;
+				j--;
+			} else {
+				// MisMatch
+				if(dp[i][j]==dp[i-1][j] + delinVal){
+					// skip s1
+					i--;
+				} else if(dp[i][j]==dp[i][j-1] + delinVal){
+					// skip s2
+					j--;
+				} else {
+					//replace
+					resultSeq=s1.charAt(i-1)+resultSeq; // take from s1 or s2
+					i--;
+					j--;
+				}
+			}
+		}
 		
-		ArrayList<String> out = new ArrayList<>();
-		out.add(currScore);
-		out.add(resultSeq);
-		return out;
+		return resultSeq;
 	}
 	// Load sequences from input file
 	public boolean loadSequencesFromFile(){
