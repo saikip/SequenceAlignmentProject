@@ -131,7 +131,7 @@ public class sequenceAssembler{
 			// Two sequences aligned, 
 			// the result replaced one's index, other one put in outdated matrix
 			currSize--;
-			//System.out.println("overall maxscore: " + currMaxScore);
+			System.out.println("overall maxscore: " + currMaxScore);
 		}
 		// Get longest among the non-outdated sequences
 		finalSequence=getLongestSequence();
@@ -150,6 +150,7 @@ public class sequenceAssembler{
 				}
 			}
 		}
+		System.out.println("Longest seq length: " + maxLen);
 		return longestSeq;
 	}
 	// Pairwise align all sequences, select 2 sequences with best scores
@@ -219,7 +220,7 @@ public class sequenceAssembler{
 		int l2=s2.length();
 		int maxscore =0;
 		
-		// quadratic space
+		//// quadratic space
 		//int[][] dp=new int[l1+1][l2+1];
 		//// base cases - in java already 0
 		////for(int i=0;i<Math.max(l1,l2);i++) {
@@ -280,8 +281,10 @@ public class sequenceAssembler{
 		
 		// Main
 		// One of this would be last row or column
-		int c=0; // column with max score
-		int r=0; // row with max score
+		int endc=0; // column with max score
+		int endr=0; // row with max score
+		int startr=0; // row start of back track
+		int startc=0; // row end of back track
 		for(int i=1;i<=l1;i++){
 			for(int j=1;j<=l2;j++){
 				if(s1.charAt(i-1)==s2.charAt(j-1)) {
@@ -293,19 +296,25 @@ public class sequenceAssembler{
 				}
 				// keep track of max number in last column or last row
 				if(i==l1) {
-					maxscore=Math.max(maxscore,dp[i][j]);
-					r=i;
-					c=j;
+					// last row
+					if(maxscore<dp[i][j]){
+						maxscore=Math.max(maxscore,dp[i][j]);
+						endr=i;
+						endc=j;
+					}
 				}
 				if(j==l2) {
-					maxscore=Math.max(maxscore,dp[i][j]);
-					r=i;
-					c=j;
+					// last column
+					if(maxscore<dp[i][j]){
+						maxscore=Math.max(maxscore,dp[i][j]);
+						endr=i;
+						endc=j;
+					}
 				}
 			}
 		}
 		// Back track
-		int i=r,j=c;
+		int i=endr,j=endc;
 	    while(i!=0 && j!=0){
 			if(s1.charAt(i-1)==s2.charAt(j-1)){
 				// Match
@@ -328,8 +337,33 @@ public class sequenceAssembler{
 				}
 			}
 		}
-		
-		return resultSeq;
+		startr=i;
+		startc=j;
+		String prefix="";
+		String dovetail=resultSeq;
+		String suffix="";
+		if(startr==0){
+			prefix=s2.substring(0,startc);
+			if(endc==l2){
+				if(endr<l1) suffix=s1.substring(endr+1);
+			} else {
+				// full first sequence eaten up
+				suffix="";
+			}
+		} else if(startc==0){
+			prefix=s1.substring(0,startr);
+			if(endr==l1){
+				if(endc<l2) suffix=s2.substring(endc+1);
+			} else {
+				// full second sequence eaten up
+				suffix="";
+			}
+		}
+		String outseq=prefix+dovetail+suffix;
+		System.out.println("curr dovetail length:"+dovetail.length());
+		System.out.println("curr new seq length:"+outseq.length());
+		return outseq;
+		//return resultSeq;
 	}
 	// Load sequences from input file
 	public boolean loadSequencesFromFile(){
@@ -355,10 +389,10 @@ public class sequenceAssembler{
 		try{
 			//System.out.println(outfilename);
 			PrintWriter writer = new PrintWriter(outfilename);
-			//writer.println(finalSequence);
-			for(int i=0;i<allSequences.size();i++){
-				writer.println(allSequences.get(i));
-			}
+			writer.println(finalSequence);
+			//for(int i=0;i<allSequences.size();i++){
+			//	writer.println(allSequences.get(i));
+			//}
 			writer.close();
 			
 		} 
