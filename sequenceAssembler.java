@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.*;
-import java.nio.*;
 /*
 Author- 
 Priyam Saikia 
@@ -164,7 +163,7 @@ public class sequenceAssembler{
 		int id1=0; //index of s1
 		int id2=0; //index of s2
 			
-		String maxSeq="just testing";
+		//String maxSeq="just testing";
 		if(firstTime){
 			// process all sequences
 			// align all sequences with each other and keep track of maxScore
@@ -208,7 +207,7 @@ public class sequenceAssembler{
 			}
 		}
 		// Get the aligned sequence for the best score
-		maxSeq=getAlignedSequence(seq1,seq2);
+		String maxSeq=getAlignedSequence(seq1,seq2);
 		//removeSet.add(id1);
 		removeSet.add(id2); //do not consider this sequence anymore
 		allSequences.set(id1,maxSeq); // replace first sequence with new aligned sequence
@@ -220,28 +219,50 @@ public class sequenceAssembler{
 		int l2=s2.length();
 		int maxscore =0;
 		
-		int[][] dp=new int[l1+1][l2+1];
-		// base cases - in java already 0
-		//for(int i=0;i<Math.max(l1,l2);i++) {
-		//	if(i<l1) dp[i][0]=0;
-		//	if(i<l2) dp[0][i]=0;
+		// quadratic space
+		//int[][] dp=new int[l1+1][l2+1];
+		//// base cases - in java already 0
+		////for(int i=0;i<Math.max(l1,l2);i++) {
+		////	if(i<l1) dp[i][0]=0;
+		////	if(i<l2) dp[0][i]=0;
+		////}
+		//// Main
+		//for(int i=1;i<=l1;i++){
+		//	for(int j=1;j<=l2;j++){
+		//		if(s1.charAt(i-1)==s2.charAt(j-1)) {
+		//			dp[i][j]=dp[i-1][j-1]+matchVal;
+		//		} else {
+		//			dp[i][j]=Math.max(dp[i-1][j-1]+replaceVal,
+		//					Math.max(dp[i-1][j] + delinVal,
+		//							 dp[i][j-1]+delinVal));
+		//		}
+		//		// keep track of max number in last column or last row
+		//		if(i==l1) maxscore=Math.max(maxscore,dp[i][j]);
+		//		if(j==l2) maxscore=Math.max(maxscore,dp[i][j]);
+		//	}
 		//}
-		// Main
+
+		// Can reduce space since we aren't back tracking now
+		// Linear space
+		int[] prevRow=new int[l2+1];
+		int[] currRow=new int[l2+1];
 		for(int i=1;i<=l1;i++){
 			for(int j=1;j<=l2;j++){
 				if(s1.charAt(i-1)==s2.charAt(j-1)) {
-					dp[i][j]=dp[i-1][j-1]+matchVal;
+					currRow[j]=prevRow[j-1]+matchVal;
 				} else {
-					dp[i][j]=Math.max(dp[i-1][j-1]+replaceVal,
-							Math.max(dp[i-1][j] + delinVal,
-									 dp[i][j-1]+delinVal));
+					currRow[j]=Math.max(prevRow[j-1]+replaceVal,
+							Math.max(prevRow[j] + delinVal,
+									 currRow[j-1]+delinVal));
 				}
 				// keep track of max number in last column or last row
-				if(i==l1) maxscore=Math.max(maxscore,dp[i][j]);
-				if(j==l2) maxscore=Math.max(maxscore,dp[i][j]);
+				if(i==l1) maxscore=Math.max(maxscore,currRow[j]);
+				if(j==l2) maxscore=Math.max(maxscore,currRow[j]);
+			}
+			for(int j=1;j<=l2;j++){
+				prevRow[j]=currRow[j];
 			}
 		}
-		
 		return maxscore;
 	}
 	// returns aligned sequence - Run backtrack just once after best 2 sequences have been found.
@@ -274,11 +295,11 @@ public class sequenceAssembler{
 				if(i==l1) {
 					maxscore=Math.max(maxscore,dp[i][j]);
 					r=i;
-					c=l2;
+					c=j;
 				}
 				if(j==l2) {
 					maxscore=Math.max(maxscore,dp[i][j]);
-					r=l1;
+					r=i;
 					c=j;
 				}
 			}
@@ -334,7 +355,10 @@ public class sequenceAssembler{
 		try{
 			//System.out.println(outfilename);
 			PrintWriter writer = new PrintWriter(outfilename);
-			writer.println(finalSequence);
+			//writer.println(finalSequence);
+			for(int i=0;i<allSequences.size();i++){
+				writer.println(allSequences.get(i));
+			}
 			writer.close();
 			
 		} 
