@@ -110,8 +110,8 @@ public class sequenceAssembler{
 		processAllSequences();
 		// Task 3: Write output to file
 		writeToOutfile();
-		System.out.println(separator);
-		System.out.println("Output written to file: " + outfilename);
+		System.out.println("\n"+separator);
+		System.out.println("\n"+"Output written to file: " + outfilename);
 	}
 	// Process all sequences until only one sequence is left 
 	// or largest alignment score is negative
@@ -122,16 +122,22 @@ public class sequenceAssembler{
 		currMaxScore=0; // current maxscore to make sure it's not negative
 		
 		// Perform rounds
+		System.out.println("Total Fragments: " + trueSize);
+		System.out.println("Calculating dovetail scores. Please wait...");
 		while(currSize>1 && currMaxScore>=0){
-			//System.out.println("# sequences:" + currSize);
-			System.out.println("# of sequences reduced to:" + currSize);
-			if(currSize==trueSize) newSeqId=alignBestSequencePair(true,0);
+			//System.out.println("# of sequences reduced to:" + currSize);
+			if(currSize==trueSize) {
+				newSeqId=alignBestSequencePair(true,0);
+				System.out.print("Sequences processed:   0 ");
+			}
 			else newSeqId=alignBestSequencePair(false,newSeqId);
 			// Reduce # sequences for next round by 1
 			// Two sequences aligned, 
 			// the result replaced one's index, other one put in outdated matrix
 			currSize--;
-			System.out.println("overall maxscore: " + currMaxScore);
+			//System.out.println("overall maxscore: " + currMaxScore);
+			double percent=((trueSize-currSize-1)*100.00/trueSize);
+			System.out.printf("\b\b\b\b\b%3d %%", (int)percent );
 		}
 		// Get longest among the non-outdated sequences
 		finalSequence=getLongestSequence();
@@ -150,7 +156,7 @@ public class sequenceAssembler{
 				}
 			}
 		}
-		System.out.println("Longest seq length: " + maxLen);
+		//System.out.println("Longest seq length: " + maxLen);
 		return longestSeq;
 	}
 	// Pairwise align all sequences, select 2 sequences with best scores
@@ -360,8 +366,10 @@ public class sequenceAssembler{
 			}
 		}
 		String outseq=prefix+dovetail+suffix;
-		System.out.println("curr dovetail length:"+dovetail.length());
-		System.out.println("curr new seq length:"+outseq.length());
+		//System.out.println("curr s1 length:"+s1.length());
+		//System.out.println("curr s2 length:"+s2.length());
+		//System.out.println("curr dovetail length:"+dovetail.length());
+		//System.out.println("curr new seq length:"+outseq.length());
 		return outseq;
 		//return resultSeq;
 	}
@@ -389,6 +397,7 @@ public class sequenceAssembler{
 		try{
 			//System.out.println(outfilename);
 			PrintWriter writer = new PrintWriter(outfilename);
+			writer.println(">");
 			writer.println(finalSequence);
 			//for(int i=0;i<allSequences.size();i++){
 			//	writer.println(allSequences.get(i));
@@ -432,7 +441,7 @@ public class sequenceAssembler{
 		ArrayList<String> filenames = loadFilenames();
 		if(filenames.size()>0) {
 			if(filenames.contains(s) || filenames.contains(s+".txt")){
-				try{
+				/*try{
 					System.out.println("Output file already exists. Do you want to replace it? Y for yes; N for no");
 					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 					String response;
@@ -452,6 +461,8 @@ public class sequenceAssembler{
 					System.out.println("IO exception in filename. Try again.");
 					return false;
 				}
+				*/
+				return true; // replacing now 
 			}
 		} else if(!s.matches("^\\d*[a-zA-Z][a-zA-Z\\d]*$")){
 			System.out.println("Output file must contain only letters and numbers. Please try again!");

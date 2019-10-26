@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.*;
-import java.nio.*;
 /*
 Author- 
 Priyam Saikia 
@@ -193,6 +192,7 @@ public class sequenceGenerator{
 			//System.out.println(outfile);
 			PrintWriter writer = new PrintWriter(outfile);
 			for(int i=0;i<numSeq;i++){
+				writer.println(">");
 				writer.println(kSeqs.get(i));
 			}
 			writer.close();
@@ -227,6 +227,7 @@ public class sequenceGenerator{
 		ArrayList<String> filenames = loadFilenames();
 		if(filenames.size()>0) {
 			if(filenames.contains(s) || filenames.contains(s+".txt")){
+				/*
 				try{
 					System.out.println("Output file already exists. Do you want to replace it? Y for yes; N for no");
 					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -247,6 +248,8 @@ public class sequenceGenerator{
 					System.out.println("IO exception in filename. Try again.");
 					return false;
 				}
+				*/
+				return true; // replacing now 
 			}
 		} else if(!s.matches("^\\d*[a-zA-Z][a-zA-Z\\d]*$")){
 			System.out.println("Output file must contain only letters and numbers. Please try again!");

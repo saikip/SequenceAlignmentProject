@@ -1,7 +1,34 @@
 import java.io.*;
 import java.util.*;
-import java.nio.*;
 import java.util.concurrent.ThreadLocalRandom;
+/*
+Author- 
+Priyam Saikia 
+Neha Rani 
+
+Version History-
+10/18/2019 - Neha Rani - Initial Version
+
+Functionality
+This program will partition the sequences in a
+file into small fragments
+
+Input
+1. string: input file name
+2. integer: x = minimum fragment length
+3. integer: y = maximum fragment length (y > x)
+4. string: output file name
+
+Functions:
+1.init
+2.loadSequencesFromFile
+3.writeToOutfile
+4.validateInFile
+5.validateOutFile
+6.loadFilenames
+7.isPosInt
+
+*/
 public class sequencePartition
 {
 	//Gobal variables
@@ -24,22 +51,24 @@ public class sequencePartition
 			return;
 		}
 		// checks
-		if(!isPosInt(args[1])){
+		if(!isPosInt(args[1]) || !isPosInt(args[2])){
 			System.out.println("Please enter positive integer the second and third arguments");
 			return;
 		}
-		
 		if(!validateInFile(args[0])) {
 			System.out.println("Input file does not exist. Make sure you enter filename with extension.");
 			return;
 		}
-	
-		
+		if(!validateOutFile(args[3])) return;
 		
 		String ifile=args[0].trim();
 		
 		int x=Integer.parseInt(args[1]);
 		int y=Integer.parseInt(args[2]);
+		if(x>y){
+			System.out.println("Value of X should be less than or equal to Y. Try again");
+			return;
+		}
 		
 		// More processing for output filename
 		String ofile=args[3].trim();
@@ -50,19 +79,16 @@ public class sequencePartition
 			// empty file 
 			ofile+=".txt";
 		}
-		System.out.println(ifile);
-		System.out.println(x);
-		System.out.println(y);
-		System.out.println(ofile);
+		//System.out.println(ifile);
+		//System.out.println(x);
+		//System.out.println(y);
+		//System.out.println(ofile);
 		//call sequencePartition
 		sequencePartition se = new sequencePartition();
 		se.init(ifile, x, y, ofile);
 	}
-	    
-		//initialises all the sequence and create subsequences according to the rule
-		public void init(String ifile, int x, int y, String ofile)
-		{
-	
+	//initialises all the sequence and create subsequences according to the rule
+	public void init(String ifile, int x, int y, String ofile){
 		min=x;
 		max=y;
 		infilename=ifile;
@@ -74,35 +100,34 @@ public class sequencePartition
 			System.out.println("Input file is empty or corrupt. No sequences loaded.");
 			return;
 		}
-		
+		// Task 2: Cut into fragments
 		for(int l=0; l<inputSequences.size(); l++)
 		{
-		String seq=inputSequences.get(l);
-	    int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
-	    int seqLen=seq.length();
-	    
-		//System.out.println(randomNum + "is random number");
-		String subSeq="";
-		for(int i=0;i<seqLen;i++)
-		{
-		    
-		    if(subSeq.length()==randomNum)
-		    {
-		        //System.out.println(randomNum);
+			String seq=inputSequences.get(l);
+			int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
+			int seqLen=seq.length();
+			
+			//System.out.println(randomNum + "is random number");
+			String subSeq="";
+			for(int i=0;i<seqLen;i++)
+			{
+				if(subSeq.length()==randomNum)
+				{
+					//System.out.println(randomNum);
+					outputSequences.add(subSeq);
+					subSeq="";
+					randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
+					
+				}
+				subSeq=subSeq+seq.charAt(i);
+			}
+			if (subSeq.length()>=min)
+			{
 				outputSequences.add(subSeq);
-		        subSeq="";
-				randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
-				
-		    }
-		    subSeq=subSeq+seq.charAt(i);
-		}
-		if (subSeq.length()>=min)
-		{
-		    outputSequences.add(subSeq);
-	
-		}
 		
+			}
 		}
+		// Task 3: Write sequences to file
 		writeToOutfile();
 		System.out.println("Output written to file: " + outfilename);
 	}
@@ -114,8 +139,8 @@ public class sequencePartition
 			BufferedReader br = new BufferedReader(new FileReader(infilename))) {
 			String line = br.readLine();
 			while (line != null) {
-			
-				inputSequences.add(line);
+				if(line.matches("[ACGT]+")) inputSequences.add(line);
+				//inputSequences.add(line);
 				line = br.readLine();
 			}
 		}
@@ -132,6 +157,7 @@ public class sequencePartition
 			
 			PrintWriter writer = new PrintWriter(outfilename);
 			for(int i=0;i<outputSequences.size();i++){
+				writer.println(">");
 				writer.println(outputSequences.get(i));
 			}
 			writer.close();
@@ -156,6 +182,46 @@ public class sequencePartition
 	public static boolean validateInFile(String s){
 		ArrayList<String> filenames = loadFilenames();
 		if(filenames.size()==0 || !filenames.contains(s)) return false;
+		return true;
+	}
+	// Validates output filename
+	public static boolean validateOutFile(String s){
+		String[] toks = s.trim().split("\\.");
+		if(toks.length>1 && !toks[toks.length-1].equals("txt")){
+			System.out.println("ERROR: Output file cannot be a "+toks[toks.length-1]+" file. Try again.");
+			return false;
+		}
+		ArrayList<String> filenames = loadFilenames();
+		if(filenames.size()>0) {
+			if(filenames.contains(s) || filenames.contains(s+".txt")){
+				/*
+				try{
+					System.out.println("Output file already exists. Do you want to replace it? Y for yes; N for no");
+					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+					String response;
+					while(true){
+						response = bufferedReader.readLine();
+						if(response.trim().toUpperCase().equals("Y")){
+							return true;
+						} else if(response.trim().toUpperCase().equals("N")){
+							System.out.println("Exiting... Try again.");
+							return false;
+						}
+						System.out.println("Invalid input! Try again.");
+					}
+				}
+				catch(IOException e){
+					e.printStackTrace();
+					System.out.println("IO exception in filename. Try again.");
+					return false;
+				}
+				*/
+				return true; // replacing now 
+			}
+		} else if(!s.matches("^\\d*[a-zA-Z][a-zA-Z\\d]*$")){
+			System.out.println("Output file must contain only letters and numbers. Please try again!");
+			return false;
+		} 
 		return true;
 	}
 	// Read all filenames in folder
