@@ -74,4 +74,4 @@ Launch4j - for executable creation
 3. Only txt files as input and output are supported.
 4. Old output files are replaced without any warning.
 
-** ------------  The End ------------  **
+#------------#------------#------------  The End ------------#------------#------------#
