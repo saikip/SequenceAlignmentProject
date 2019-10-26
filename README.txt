@@ -7,7 +7,14 @@
 ** UFID: 9414 5292 **
 ** UFID: 3875 9234 **
 
-# ------------  FILES in Zip Folder: ------------  *
+# PROJECT DETAILS
+Project implements:
+
+1.Simulator for sequence generator
+2.Simulator for sequence partitioning
+3. Sequence assembler
+
+# FILES in Zip Folder
 
 ** Java Files (and their corresponding class files): **
 
@@ -29,11 +36,11 @@
 1. makefile
 2. readme.md
 
-** ------------  Languages/Tools used: ------------  **
+# Languages/Tools used
 Java
 Launch4j
 
-** ------------  Instructions to run: ------------  **
+# Instructions to run
 1. Extract files from Zip folder. 
 2. Open command prompt or Terminal in your current directory.
 3. You can run the programs using three methods:
@@ -51,9 +58,11 @@ Launch4j
 		3. java sequenceAssembler out2.txt 1 -1 -3 out3.txt
 3. The output files will be created and placed in your current directory.
 
-** ------------  NOTES ------------  **
+# NOTES
 1. We have a make file that compiles all java files in case any of the java files are updated
 	Type "make" without quotes in command prompt and enter
 2. File names cannot have anything other than letters and numbers.
 3. Only txt files as input and output are supported.
 4. Old output files are replaced without any warning.
+
+** ------------  The End ------------  **
