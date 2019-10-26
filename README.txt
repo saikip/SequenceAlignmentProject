@@ -10,8 +10,7 @@
 Project implements:
 
 1. Simulator for sequence generator
-2. Simulator for sequence partitioning - 
-Function for generating sub sequence with length of each sub sequence as a random number between the user input minimum and maximum integer. If the length of sub sequence is less than the miminum specified then it is discarded. The input sequence is taken from a text file in FASTA format. This input text file is actulaly the output of the sequence generator. All the output subsequence is printed in text file in FASATA format.
+2. Simulator for sequence partitioning - Function for generating sub sequence with length of each sub sequence as a random number between the user input minimum and maximum integer. If the length of sub sequence is less than the miminum specified then it is discarded. The input sequence is taken from a text file in FASTA format. This input text file is actulaly the output of the sequence generator. All the output subsequence is printed in text file in FASATA format.
 3. Sequence assembler
 
 # FILES in Zip Folder
