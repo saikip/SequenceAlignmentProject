@@ -45,9 +45,12 @@ Launch4j
 2. Open command prompt or Terminal in your current directory.
 3. You can run the programs using three methods:
 	1. Using exe - This won't let you see our error and warning prompts in case of wrong inputs.
-		1. hw1-1 10000 25 25 25 25 10 0.005 out1.txt
-		2. hw1-2 out1.txt 100 150 out2.txt
-		3. hw1-3 out2.txt 1 -1 -3 out3.txt
+		1. hw1-1 seqLength FractionA FractionC FractionG FractionT NumofSeq mutationProb outputFileName
+		sample: hw1-1 10000 25 25 25 25 10 0.005 out1.txt
+		2. hw1-2 inputFileName minFragmentLen maxFragmentLen outputFileName
+		sample: hw1-2 out1.txt 100 150 out2.txt
+		3. hw1-3 inputFileName scoreMatch penaltyReplace penaltyDelete outputFileName
+		sample: hw1-3 out2.txt 1 -1 -3 out3.txt
 	2. Using java jar - This will let you see our error and warning prompts
 		1. java -jar hw1-1.jar 10000 25 25 25 25 10 0.005 out1.txt
 		2. java -jar hw1-2.jar out1.txt 100 150 out2.txt
