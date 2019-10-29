@@ -136,7 +136,7 @@ public class sequenceAssembler{
 			// the result replaced one's index, other one put in outdated matrix
 			currSize--;
 			//System.out.println("overall maxscore: " + currMaxScore);
-			double percent=((trueSize-currSize-1)*100.00/trueSize);
+			double percent=((trueSize-currSize-2)*100.00/trueSize);
 			System.out.printf("\b\b\b\b\b%3d %%", (int)percent );
 		}
 		// Get longest among the non-outdated sequences
@@ -380,8 +380,14 @@ public class sequenceAssembler{
 		try(
 			BufferedReader br = new BufferedReader(new FileReader(infilename))) {
 			String line = br.readLine();
+			String curSeq="";
 			while (line != null) {
-				if(line.matches("[ACGT]+")) allSequences.add(line);
+				//if(line.matches("[ACGT]+")) allSequences.add(line);
+				if(line.matches("[ACGT]+")) curSeq=curSeq+line;
+				else if(line.matches("[>]+")){
+					if(!curSeq.isEmpty()) allSequences.add(curSeq);
+					curSeq="";
+				}
 				line = br.readLine();
 			}
 		}
@@ -398,10 +404,13 @@ public class sequenceAssembler{
 			//System.out.println(outfilename);
 			PrintWriter writer = new PrintWriter(outfilename);
 			writer.println(">");
-			writer.println(finalSequence);
-			//for(int i=0;i<allSequences.size();i++){
-			//	writer.println(allSequences.get(i));
-			//}
+			//writer.println(finalSequence);
+			int j=0;
+			while(j+80<finalSequence.length()){
+				writer.println(finalSequence.substring(j,j+80));
+				j=j+80;
+			}
+			if(j<finalSequence.length()) writer.println(finalSequence.substring(j));
 			writer.close();
 			
 		} 

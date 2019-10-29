@@ -138,9 +138,14 @@ public class sequencePartition
 		try(
 			BufferedReader br = new BufferedReader(new FileReader(infilename))) {
 			String line = br.readLine();
+			String curSeq="";
 			while (line != null) {
-				if(line.matches("[ACGT]+")) inputSequences.add(line);
-				//inputSequences.add(line);
+				//if(line.matches("[ACGT]+")) inputSequences.add(line);
+				if(line.matches("[ACGT]+")) curSeq=curSeq+line;
+				else if(line.matches("[>]+")){
+					if(!curSeq.isEmpty()) inputSequences.add(curSeq);
+					curSeq="";
+				}
 				line = br.readLine();
 			}
 		}
@@ -158,7 +163,14 @@ public class sequencePartition
 			PrintWriter writer = new PrintWriter(outfilename);
 			for(int i=0;i<outputSequences.size();i++){
 				writer.println(">");
-				writer.println(outputSequences.get(i));
+				//writer.println(outputSequences.get(i));
+				String curSeq=outputSequences.get(i);
+				int j=0;
+				while(j+80<curSeq.length()){
+					writer.println(curSeq.substring(j,j+80));
+					j=j+80;
+				}
+				if(j<curSeq.length()) writer.println(curSeq.substring(j));
 			}
 			writer.close();
 			

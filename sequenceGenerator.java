@@ -193,7 +193,14 @@ public class sequenceGenerator{
 			PrintWriter writer = new PrintWriter(outfile);
 			for(int i=0;i<numSeq;i++){
 				writer.println(">");
-				writer.println(kSeqs.get(i));
+				//writer.println(kSeqs.get(i));
+				String curSeq=kSeqs.get(i);
+				int j=0;
+				while(j+80<curSeq.length()){
+					writer.println(curSeq.substring(j,j+80));
+					j=j+80;
+				}
+				if(j<curSeq.length()) writer.println(curSeq.substring(j));
 			}
 			writer.close();
 			

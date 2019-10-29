@@ -9,9 +9,21 @@
 # PROJECT DETAILS
 Project implements:
 
-1. Simulator for sequence generator
-2. Simulator for sequence partitioning
-3. Sequence assembler
+1. Function for sequence generator - This function generates k number of sequences of length n each.
+The first sequence is generated with randomly generated A,C,G and T as per the user input proportions.
+The mutation probability is used to generated the the next k-1 similar sequences. The generated k
+sequences are stored in output text file in FASTA format.
+2. Function for sequence partitioning - Function for generating sub sequence with length of each sub sequence as a random number 
+between the user input minimum and maximum integer. If the length of sub sequence is less than the 
+miminum specified then it is discarded. The input sequence is taken from a text file in FASTA 
+format. This input text file is actulaly the output of the sequence generator. All the output 
+subsequence is printed in text file in FASATA format.
+3. Function for Sequence assembler - This function takes the input from a text file that consists
+of fragments of sequences in FASTA format. Alignment scores using dovetail alignment is calculated 
+between every two pair of sequences/fragments. The two sequences of with best alignment score are 
+then merged and replaced with the newly merged/aligned sequence. This process is repeated until only
+one sequence is left or until the highest alignment score is negative. The longest sequence from the
+resulting sequences is stored in an output test file in FASTA format.
 
 # FILES in Zip Folder
 
