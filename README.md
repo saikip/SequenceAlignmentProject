@@ -6,7 +6,7 @@
 
 ** Neha Rani (UFID: 3875 9234) **
 
-# PROJECT DETAILS
+# PROJECT DETAILS (Requirements detailed in hw1.pdf file)
 Project implements:
 
 1. Function for sequence generator - This function generates k number of sequences of length n each.
