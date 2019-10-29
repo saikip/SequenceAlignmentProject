@@ -79,11 +79,10 @@ Launch4j - for executable creation
 3. The output files will be created and placed in your current directory.
 
 # NOTES
-1. We have a make file that compiles all java files in case any of the java files are updated
-	
-	Type ```"make"``` without quotes in command prompt and enter
+1. Only txt files as input and output are supported as of now.
 2. File names cannot have anything other than letters and numbers.
-3. Only txt files as input and output are supported.
-4. Old output files are replaced without any warning.
+3. Old output files are replaced without any warning.
+4. System has to have java (jdk 1.7+ and jre 1.7+) to run any java or jar command from command prompt. Latest jdk and jre can be installed from [here](https://www.oracle.com/technetwork/java/javase/downloads/index.html). Once installed/updated, add jdk and jre path to system environment variables to be able to call "java" from command prompt (Explained [here](https://www.java.com/en/download/help/path.xml)).
+5. Makefile is available that compiles all java files to support any changes to the code in the java files. To run makefile, Type ```"make"``` without quotes in command prompt and enter.
 
 #------------#------------#------------  The End ------------#------------#------------#
